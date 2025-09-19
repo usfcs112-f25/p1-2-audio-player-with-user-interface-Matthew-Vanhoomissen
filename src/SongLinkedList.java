@@ -36,6 +36,7 @@ public class SongLinkedList {
         SongNode newNode = new SongNode(song);
         if(head != null) {
             newNode.setNext(head);
+            head.setPrev(newNode);
         }
         head = newNode;
         size++;
@@ -62,10 +63,14 @@ public class SongLinkedList {
             addLast(song);
             return;
         }
+         
         SongNode newNode = new SongNode(song);
         SongNode prev = get(index - 1);
-        newNode.setNext(prev.getSongNext());
+        SongNode next = get(index);
+        next.setPrev(newNode);
+        newNode.setNext(next);
         prev.setNext(newNode);
+        newNode.setPrev(prev);
         size++;
         
     }
@@ -80,20 +85,20 @@ public class SongLinkedList {
         }
 
         if (index == 1) {
-            head = head.getSongNext();
-            if (head == null) {
-                tail = null;
-            } // list became empty
-            size--;
+            removeFirst();
+            return;
+        }
+        else if(index == size) {
+            removeLast();
             return;
         }
         SongNode prev = get(index - 1);
+        SongNode next = get(index + 1);
         SongNode remove = prev.getSongNext();
-        prev.setNext(remove.getSongNext());
+        next.setPrev(prev);
+        prev.setNext(next);
+        remove.setPrev(null);
 
-        if(index == size) {
-            tail = prev;
-        }
         
         size--;
         
@@ -172,6 +177,7 @@ public class SongLinkedList {
         SongNode newNode = new SongNode(song);
         if(tail != null) {
             tail.setNext(newNode);
+            newNode.setPrev(tail);
         }
         tail = newNode;
         size++;
@@ -183,36 +189,37 @@ public class SongLinkedList {
      * Removes from from of list
      */
     public void removeFirst() {
-        
-        head = head.getSongNext();
-        
-        size--;
-        if(size == 0) {
-            tail = null;
-        }
-
-    }
-    /*
-     * Removes last of list
-     */
-    public void removeLast() {
-        SongNode currNode = head;
         if(size == 1) {
             tail = null;
             head = null;
             size--;
             return;
         }
-        while((currNode.getSongNext()).getSongNext() != null) {
-            
-            currNode = currNode.getSongNext();
-        }
-        tail = currNode;
-        currNode.setNext(null);
+
+        head.getSongNext().setPrev(null);
+        head = head.getSongNext();
+        
         size--;
-        if(size == 0) {
+        
+
+    }
+    /*
+     * Removes last of list
+     */
+    public void removeLast() {
+        
+        if(size == 1) {
+            tail = null;
             head = null;
+            size--;
+            return;
         }
+        SongNode newEnd = tail.getPrev();
+        tail.getPrev().setNext(null);
+        tail.setPrev(null);
+        tail = newEnd;
+        size--;
+        
     }
 
     /*
