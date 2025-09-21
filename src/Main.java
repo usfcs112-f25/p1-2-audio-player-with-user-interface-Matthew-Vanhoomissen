@@ -1,6 +1,7 @@
 import javax.swing.border.Border;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 public class Main {
     public static boolean paused = false;
@@ -8,7 +9,7 @@ public class Main {
         Playlist songs = new Playlist();
         SongPlayer songPlayer = songs.getSongPlayer();
         songs.addSong(new Song("Test1", "T", 10, "T", "../music/running-night-393139.mp3"));
-        songs.addSong(new Song("Test2", "T", 10, "T", "///"));
+        songs.addSong(new Song("Test2", "T", 10, "T", "../music/file_example_WAV_1MG.wav"));
 
 
         
@@ -47,8 +48,37 @@ public class Main {
             songs.getSongPlayer().stopSong();
         });
 
+        JButton next = new JButton("Next");
+        JButton prev = new JButton("Prev");
+
+        next.addActionListener(e -> {
+            songs.playNext();
+            output.setText("Current " + songs.getCurrentSong().toString());
+
+        });
+
+        prev.addActionListener(e -> {
+            songs.playPrev();
+            output.setText("Current " + songs.getCurrentSong().toString());
+
+        });
+
+        JButton file = new JButton("Select file");
+
+        file.addActionListener(e -> {
+            
+            JFileChooser fileChoice = new JFileChooser();
+            int choice = fileChoice.showOpenDialog(frame);
+            if(choice == JFileChooser.APPROVE_OPTION) {
+                File chosenFile = fileChoice.getSelectedFile();
+                String filePath = chosenFile.getAbsolutePath();
+                
+                songs.addSong(new Song("Test3", "Me", 20, "Test", filePath));
+            }
+            
+        });
+
         
-        output.setText("Current " + songs.getCurrentSong().toString());
 
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
         row1.add(output);
@@ -62,10 +92,18 @@ public class Main {
         row3.add(pause);
         row3.add(stop);
 
+        JPanel row4 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        row4.add(next);
+        row4.add(prev);
+        row4.add(file);
+
         test.setLayout(new BoxLayout(test, BoxLayout.Y_AXIS));
         test.add(row1);
         test.add(row2);
         test.add(row3);
+        test.add(row4);
+        
+
         frame.setLayout(new BorderLayout());
 
         

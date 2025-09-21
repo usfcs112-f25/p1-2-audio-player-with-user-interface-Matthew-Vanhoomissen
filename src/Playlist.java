@@ -172,6 +172,8 @@ public class Playlist {
         
     }
 
+
+
     /*
      * prints songs within second range
      * @params first lower value and second higher value
@@ -245,6 +247,13 @@ public class Playlist {
                 System.out.println("No song available");
             }
             
+        }
+    }
+
+    public void playPrev() {
+        if(currentNode != null && currentNode.getPrev() != null) {
+            currentNode = currentNode.getPrev();
+            playCurrentSong();
         }
     }
 

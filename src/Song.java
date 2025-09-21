@@ -59,7 +59,7 @@ public class Song {
      * @returns readable string
      */
     public String toString() {
-        String temp = "Song: " + title + "\n - Artist: " + artist + "\n - Duration: " + duration + "\n - File Path: " + filePath;
+        String temp = "Song: " + title + "\n - Artist: " + artist + "\n - Duration: " + duration + "\n - Genre: " + genre;
         return temp;
     }
 } 
