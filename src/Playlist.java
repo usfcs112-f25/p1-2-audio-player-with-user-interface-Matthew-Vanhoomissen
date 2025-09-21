@@ -66,13 +66,23 @@ public class Playlist {
     /*
      * Displays playlist songs
      */
-    public void displayPlaylist() {
+    public void displayForward() {
         SongNode temp = songs.getHead();
         int num = 1;
         while(temp != null) {
             System.out.println(num + ". " + temp.getSong());
             temp = temp.getSongNext();
             num++;
+        }
+    }
+
+    public void displayBackward() {
+        SongNode temp = songs.getTail();
+        int num = songs.size();
+        while(temp != null) {
+            System.out.println(num + ". " + temp.getSong());
+            temp = temp.getPrev();
+            num--;
         }
     }
     /*

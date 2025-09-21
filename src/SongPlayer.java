@@ -16,7 +16,7 @@ public class SongPlayer {
      */
     public boolean playSong(Song song, Runnable whenSongEnds) throws AudioException{
         try {
-            JavaFXInitializer.intializing();
+            JavaFXInitializer.initalizing();
             
 
             File songFile = new File(song.getFilePath());

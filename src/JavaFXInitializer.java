@@ -11,7 +11,7 @@ public class JavaFXInitializer {
     /*
      * Initializes the JFXPanel 
      */
-    public static void intializing() {
+    public static void initalizing() {
         if(!initialize) {
             new JFXPanel();
             initialize = true;
@@ -23,7 +23,7 @@ public class JavaFXInitializer {
     public static void quitting() {
         if(initialize) {
             Platform.exit();
-            initialize = true;
+            initialize = false;
         }
     }
 }
