@@ -5,6 +5,11 @@ import java.io.File;
 
 public class Main {
     public static boolean paused = false;
+    public static String name;
+    public static String artist;
+    public static int duration;
+    public static String genre;
+    public static String filePath;
     public static void main(String[] args) {
         Playlist songs = new Playlist();
         SongPlayer songPlayer = songs.getSongPlayer();
@@ -23,6 +28,7 @@ public class Main {
         JButton stop = new JButton("Stop");
 
         JPanel test = new JPanel();
+        JPanel right = new JPanel();
         
         test.add(button, BorderLayout.SOUTH);
         
@@ -78,6 +84,12 @@ public class Main {
             
         });
 
+        JTextField inputName = new JTextField();
+        JTextField inputArtist = new JTextField();
+        JTextField inputDuration = new JTextField();
+        JTextField inputGenre = new JTextField();
+
+
         
 
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -95,20 +107,32 @@ public class Main {
         JPanel row4 = new JPanel(new FlowLayout(FlowLayout.CENTER));
         row4.add(next);
         row4.add(prev);
-        row4.add(file);
+        
+
+        JPanel rightSide = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        rightSide.add(file);
 
         test.setLayout(new BoxLayout(test, BoxLayout.Y_AXIS));
         test.add(row1);
         test.add(row2);
         test.add(row3);
         test.add(row4);
-        
+
+
+        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
+        right.add(inputName);
+        right.add(inputArtist);
+        right.add(inputDuration);
+        right.add(inputGenre);
+        right.add(rightSide);
+
 
         frame.setLayout(new BorderLayout());
 
         
         
-        frame.add(test);
+        frame.add(test, BorderLayout.CENTER);
+        frame.add(right, BorderLayout.EAST);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 400);
         frame.setVisible(true);
