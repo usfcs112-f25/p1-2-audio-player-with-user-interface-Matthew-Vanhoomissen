@@ -9,7 +9,7 @@ public class Main {
     public static String artist;
     public static int duration;
     public static String genre;
-    public static String filePath;
+    public static String filePath = "";
     public static void main(String[] args) {
         Playlist songs = new Playlist();
         SongPlayer songPlayer = songs.getSongPlayer();
@@ -77,19 +77,32 @@ public class Main {
             int choice = fileChoice.showOpenDialog(frame);
             if(choice == JFileChooser.APPROVE_OPTION) {
                 File chosenFile = fileChoice.getSelectedFile();
-                String filePath = chosenFile.getAbsolutePath();
+                filePath = chosenFile.getAbsolutePath();
                 
-                songs.addSong(new Song("Test3", "Me", 20, "Test", filePath));
+                
             }
             
         });
 
         JTextField inputName = new JTextField();
+        inputName.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         JTextField inputArtist = new JTextField();
+        inputArtist.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         JTextField inputDuration = new JTextField();
+        inputDuration.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         JTextField inputGenre = new JTextField();
+        inputGenre.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+        JButton submit = new JButton("Add song");
 
-
+        submit.addActionListener(e -> {
+            if(inputName.getText().isBlank() || inputArtist.getText().isBlank() || inputDuration.getText().isBlank() || inputGenre.getText().isBlank() || filePath.isBlank()) {
+                output.setText("Could not add new song. Input box left blank");                
+            }
+            else {
+                songs.addSong(new Song(inputName.getText(), inputArtist.getText(), Integer.parseInt(inputDuration.getText()), inputGenre.getText(), filePath));
+                output.setText("Song added");
+            }
+        });
         
 
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -111,6 +124,7 @@ public class Main {
 
         JPanel rightSide = new JPanel(new FlowLayout(FlowLayout.CENTER));
         rightSide.add(file);
+        rightSide.add(submit);
 
         test.setLayout(new BoxLayout(test, BoxLayout.Y_AXIS));
         test.add(row1);

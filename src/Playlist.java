@@ -8,6 +8,7 @@ public class Playlist {
     private SongLinkedList songs;
     
     private SongNode currentNode;
+    private int currentInt;
     SongPlayer songPlayer;
     private boolean repeatSong;
     private boolean repeatPlaylist;
@@ -18,6 +19,7 @@ public class Playlist {
     public Playlist() {
         songs = new SongLinkedList();
         currentNode = null;
+        currentInt = 1;
         songPlayer = new SongPlayer();
         repeatSong = false;
         repeatPlaylist = false;
@@ -122,6 +124,7 @@ public class Playlist {
             while(temp != null) {
                 if(counter == index) {
                     currentNode = temp;
+                    currentInt = index;
                     return true;
                 }
                 temp = temp.getSongNext();
@@ -211,6 +214,7 @@ public class Playlist {
      */
     public void playFromStart() {
         currentNode = songs.getHead();
+        currentInt = 1;
         playCurrentSong();
     }
 
@@ -218,7 +222,9 @@ public class Playlist {
      * Sets current node to random within bounds and plays
      */
     public void playRandom() {
-        currentNode = songs.get((int)(Math.random() * songs.size()) + 1);
+        int num = (int)(Math.random() * songs.size()) + 1;
+        currentNode = songs.get(num);
+        currentInt = num;
         playCurrentSong();
     }
 
@@ -236,6 +242,7 @@ public class Playlist {
         if(currentNode != null && currentNode.getSongNext() != null) {
             
             currentNode = currentNode.getSongNext();
+            currentInt++;
             playCurrentSong();
         }
         else {
@@ -253,6 +260,7 @@ public class Playlist {
     public void playPrev() {
         if(currentNode != null && currentNode.getPrev() != null) {
             currentNode = currentNode.getPrev();
+            currentInt--;
             playCurrentSong();
         }
     }
