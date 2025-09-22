@@ -35,6 +35,7 @@ public class Main {
 
         button.addActionListener(e -> {
             songs.playCurrentSong();
+            output.setText("Current " + songs.getCurrentSong().toString());
         });
 
         pause.addActionListener(e -> {
@@ -60,14 +61,19 @@ public class Main {
         next.addActionListener(e -> {
             songs.playNext();
             output.setText("Current " + songs.getCurrentSong().toString());
+            paused = false;
+            pause.setText("Pause");
 
         });
 
         prev.addActionListener(e -> {
             songs.playPrev();
             output.setText("Current " + songs.getCurrentSong().toString());
-
+            paused = false;
+            pause.setText("Pause");
         });
+
+        
 
         JButton file = new JButton("Select file");
 
@@ -83,6 +89,14 @@ public class Main {
             }
             
         });
+        DefaultListModel<String> list = new DefaultListModel<>();
+        JList<String> playlist = new JList<>(list);
+        JScrollPane scrollPane = new JScrollPane(playlist);
+        SongNode temp = songs.getSongs().getHead();
+        while(temp != null) {
+            list.addElement(temp.getSong().getTitle());
+            temp = temp.getSongNext();
+        }
 
         JTextField inputName = new JTextField();
         inputName.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
@@ -101,8 +115,25 @@ public class Main {
             else {
                 songs.addSong(new Song(inputName.getText(), inputArtist.getText(), Integer.parseInt(inputDuration.getText()), inputGenre.getText(), filePath));
                 output.setText("Song added");
+                list.addElement(inputName.getText());
+                
             }
         });
+
+        JButton remove = new JButton("Remove song");
+
+        remove.addActionListener(e -> {
+            for(int i = list.size() - 1 ; i >= 0; i--) {
+                if(list.get(i).equals(songs.getSongs().get(songs.getCurrentInt()).getSong().getTitle())) {
+                    list.remove(i);
+                }
+            }
+            songs.getSongs().removeAt(songs.getCurrentInt());
+            
+            songs.setCurrentSong(1);
+        });
+
+        
         
 
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -120,6 +151,9 @@ public class Main {
         JPanel row4 = new JPanel(new FlowLayout(FlowLayout.CENTER));
         row4.add(next);
         row4.add(prev);
+
+        JPanel row5 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        row5.add(remove);
         
 
         JPanel rightSide = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -131,6 +165,7 @@ public class Main {
         test.add(row2);
         test.add(row3);
         test.add(row4);
+        test.add(row5);
 
 
         right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
@@ -139,6 +174,7 @@ public class Main {
         right.add(inputDuration);
         right.add(inputGenre);
         right.add(rightSide);
+        right.add(scrollPane);
 
 
         frame.setLayout(new BorderLayout());
@@ -147,6 +183,7 @@ public class Main {
         
         frame.add(test, BorderLayout.CENTER);
         frame.add(right, BorderLayout.EAST);
+     
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 400);
         frame.setVisible(true);

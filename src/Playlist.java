@@ -39,6 +39,9 @@ public class Playlist {
     public boolean getRepeatPlaylist() {
         return repeatPlaylist;
     }
+    public int getCurrentInt() {
+        return currentInt;
+    }
 
     /*
      * Toggles the repeating song/playlist by switching value
