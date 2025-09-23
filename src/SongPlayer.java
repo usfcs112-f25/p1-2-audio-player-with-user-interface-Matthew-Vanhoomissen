@@ -8,6 +8,10 @@ import java.io.File;
 public class SongPlayer {
     private MediaPlayer mediaPlayer;
 
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
     /*
      * Plays the song
      * @params the song, and a trigger for when song ends
@@ -23,6 +27,7 @@ public class SongPlayer {
             mediaPlayer = new MediaPlayer(new Media(songFile.toURI().toString()));
             
             mediaPlayer.setOnEndOfMedia(whenSongEnds);
+            
 
             mediaPlayer.play();
             return true;

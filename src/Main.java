@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.awt.event.MouseEvent;
 
 public class Main {
@@ -18,13 +19,14 @@ public class Main {
     public static int duration;
     public static String genre;
     public static String filePath = "";
+    public static boolean muted = false;
     public static void main(String[] args) {
         ArrayList<Playlist> playlists = new ArrayList<>();
         Playlist songs = new Playlist("Playlist1");
         playlists.add(songs);
         SongPlayer songPlayer = songs.getSongPlayer();
         songs.addSong(new Song("Test1", "T", 10, "T", "../music/running-night-393139.mp3"));
-        songs.addSong(new Song("Test2", "T", 10, "T", "../music/file_example_WAV_1MG.wav"));
+        songs.addSong(new Song("Test2", "T", 20, "T", "../music/file_example_WAV_1MG.wav"));
 
 
         
@@ -32,7 +34,10 @@ public class Main {
         JFrame frame = new JFrame("Spotify Playlist (Swing)");
 
         JTextArea output = new JTextArea(5, 20);
-        JTextField input = new JTextField(15);
+
+        
+
+        
         JButton button = new JButton("Start");
         JButton pause = new JButton("Pause");
         JButton stop = new JButton("Stop");
@@ -252,20 +257,186 @@ public class Main {
             }
         });
 
+        JLabel repeatSong = new JLabel("Repeat song");
+        repeatSong.setPreferredSize(new Dimension(120, 25));
+        JCheckBox repeatingSong = new JCheckBox();
 
-        JPanel leftSide = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        repeatingSong.addActionListener(e -> {
+            songs.toggleRepeatSong();
+        });
+
+        JLabel repeatPlaylist = new JLabel("Repeat playlist");
+        repeatPlaylist.setPreferredSize(new Dimension(120, 25));
+        JCheckBox repeatingPlaylist = new JCheckBox();
+
+        repeatingPlaylist.addActionListener(e -> {
+            songs.toggleRepeatPlaylist();
+        });
+
+        JSlider slider = new JSlider(0, 2, 1);
+        slider.setMajorTickSpacing(1);
+        slider.setPaintTicks(true);
+        slider.setSnapToTicks(true);
+
+        slider.addChangeListener(e -> {
+            int value = slider.getValue();
+            if(value == 0) {
+                songPlayer.setVolume(.3);
+            }
+            else if(value == 1) {
+                songPlayer.setVolume(.6);
+            }
+            else {
+                songPlayer.setVolume(1);
+            }
+        });
+
+        JButton mute = new JButton("Mute");
+
+        mute.addActionListener(e -> {
+            if(muted) {
+                songPlayer.setVolume(.6);
+            }
+            else {
+                songPlayer.setVolume(0);
+            }
+            muted = !muted;
+        });
+
+        JButton reset = new JButton("Reset");
+        JTextField input = new JTextField(15);
+        JButton search = new JButton("Search");
+
+        reset.setPreferredSize(new Dimension(70, 20));
+        search.setPreferredSize(new Dimension(80, 20));
+        search.addActionListener(e -> {
+            String text = input.getText();
+            if(!text.isBlank()) {
+                for(int i = list.size() - 1; i >= 0; i--) {
+                    list.remove(i);
+                }
+                SongNode temp2 = songs.getSongs().getHead();
+                while(temp2 != null) {
+                    if(input.getText().equalsIgnoreCase(temp2.getSong().getTitle())) {
+                        list.addElement(temp2.getSong().getTitle());
+                    }
+                    temp2 = temp2.getSongNext();
+                } 
+            }
+        });
+
+        reset.addActionListener(e -> {
+            for(int i = list.size() - 1; i >= 0; i--) {
+                list.remove(i);
+            }
+            SongNode temp2 = songs.getSongs().getHead();
+            while(temp2 != null) {
+                list.addElement(temp2.getSong().getTitle());
+                temp2 = temp2.getSongNext();
+            } 
+        });
+
+        JComboBox sort = new JComboBox<String>(new String[]{"Sort by: ", "Title", "Artist", "Duration"});
+        sort.setPreferredSize(new Dimension(120, 25));
+        JButton sortEnter = new JButton("Enter");
+
+        sortEnter.addActionListener(e -> {
+            if(sort.getSelectedItem().equals("Title")) {
+                for(int i = list.size() - 1; i >= 0; i--) {
+                    list.remove(i);
+                }
+                ArrayList<String> array = new ArrayList<>();
+                SongNode temp3 = songs.getSongs().getHead();
+                while(temp3 != null) {
+                    array.add(temp3.getSong().getTitle());
+                    temp3 = temp3.getSongNext();
+                }
+                if(array != null) {
+                    Collections.sort(array);
+                }
+                for(String s : array) {
+                    list.addElement(s);
+                }
+
+            }
+            else if(sort.getSelectedItem().equals("Artist")) {
+                for(int i = list.size() - 1; i >= 0; i--) {
+                    list.remove(i);
+                }
+                ArrayList<String> array = new ArrayList<>();
+                SongNode temp3 = songs.getSongs().getHead();
+                while(temp3 != null) {
+                    array.add(temp3.getSong().getArtist());
+                    temp3 = temp3.getSongNext();
+                }
+                if(array != null) {
+                    Collections.sort(array);
+                }
+                for(String s : array) {
+                    list.addElement(s);
+                }
+            }
+            else if(sort.getSelectedItem().equals("Duration")) {
+                for(int i = list.size() - 1; i >= 0; i--) {
+                    list.remove(i);
+                }
+                ArrayList<SongNode> array = new ArrayList<>();
+                SongNode temp3 = songs.getSongs().getHead();
+                while(temp3 != null) {
+                    array.add(temp3);
+                    temp3 = temp3.getSongNext();
+                }
+               
+                
+                while(array.size() > 0) {
+                    SongNode remove2 = null;
+                    int duration = -1;
+                    for(SongNode s : array) {
+                        if(s.getSong().getDuration() > duration) {
+                            duration = s.getSong().getDuration();
+                            remove2 = s;
+                        }
+                    }
+                    list.addElement(remove2.getSong().getTitle());
+                    array.remove(remove2);
+                }
+            }
+        });
+
+        JPanel leftSide = new JPanel(new FlowLayout(FlowLayout.LEFT));
         leftSide.add(menu);
         leftSide.add(editPlaylist);
         leftSide.add(topLeftSubmit);
-        
+
+
+        JPanel leftRow1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftRow1.add(repeatSong);
+        leftRow1.add(repeatingSong);
+
+        JPanel leftRow2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftRow2.add(repeatPlaylist);
+        leftRow2.add(repeatingPlaylist);
+
+        JPanel leftRow3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftRow3.add(slider);
+        leftRow3.add(mute);
+
+        JPanel leftRow4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftRow4.add(sort);
+        leftRow4.add(sortEnter);
         
 
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
         row1.add(output);
 
         JPanel row2 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        
         row2.add(input);
         
+
+        JPanel row2_5 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        row2_5.add(search);
+        row2_5.add(reset);
 
         JPanel row3 = new JPanel(new FlowLayout(FlowLayout.CENTER));
         row3.add(button);
@@ -288,6 +459,7 @@ public class Main {
         test.setLayout(new BoxLayout(test, BoxLayout.Y_AXIS));
         test.add(row1);
         test.add(row2);
+        test.add(row2_5);
         test.add(row3);
         test.add(row4);
         test.add(row5);
@@ -303,7 +475,12 @@ public class Main {
         right.add(exit);
 
         left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
+        left.setAlignmentY(Component.TOP_ALIGNMENT);
         left.add(leftSide);
+        left.add(leftRow1);
+        left.add(leftRow2);
+        left.add(leftRow3);
+        left.add(leftRow4);
 
 
         frame.setLayout(new BorderLayout());
@@ -315,7 +492,7 @@ public class Main {
         frame.add(left, BorderLayout.WEST);
      
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 400);
+        frame.setSize(800, 600);
         frame.setVisible(true);
 
     }
