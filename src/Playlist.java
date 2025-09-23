@@ -33,6 +33,9 @@ public class Playlist {
     /*
      * returns each respective value
      */
+    public String getName() {
+        return name;
+    }
     public SongLinkedList getSongs() {
         return songs;
     }

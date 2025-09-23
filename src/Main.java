@@ -20,9 +20,10 @@ public class Main {
     public static String genre;
     public static String filePath = "";
     public static boolean muted = false;
+    public static Playlist songs = new Playlist("Playlist1");
     public static void main(String[] args) {
         ArrayList<Playlist> playlists = new ArrayList<>();
-        Playlist songs = new Playlist("Playlist1");
+        
         playlists.add(songs);
         SongPlayer songPlayer = songs.getSongPlayer();
         songs.addSong(new Song("Test1", "T", 10, "T", "../music/running-night-393139.mp3"));
@@ -210,7 +211,7 @@ public class Main {
 
         playlist.setCellRenderer((jlist, value, index, isSelected, cellHasFocus) -> {
             JLabel label2 = new JLabel(value);
-            if(value.equals(songs.getCurrentSong().getSong().getTitle())) {
+            if(songs.getCurrentSong() != null &&value.equals(songs.getCurrentSong().getSong().getTitle())) {
                 label2.setOpaque(true);
                 label2.setBackground(Color.LIGHT_GRAY);
             }
@@ -270,6 +271,19 @@ public class Main {
                     }
                 }
             }
+            else {
+                String name =(String) editPlaylist.getSelectedItem();
+                if(!name.equals(songs.getName())) {
+                    for(Playlist p : playlists) {
+                        if(p.getName().equals(name)) {
+                            songs = p;
+                            System.out.println("Playlist switched");
+                            break;
+                        }
+                    }
+                }
+            }
+            
         });
 
         JLabel repeatSong = new JLabel("Repeat song");
