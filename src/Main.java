@@ -1,7 +1,9 @@
 import javax.swing.border.Border;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.io.File;
+import java.awt.event.MouseEvent;
 
 public class Main {
     public static boolean paused = false;
@@ -31,11 +33,21 @@ public class Main {
         JPanel right = new JPanel();
         
         test.add(button, BorderLayout.SOUTH);
-        
+
+        DefaultListModel<String> list = new DefaultListModel<>();
+        JList<String> playlist = new JList<>(list);
+        JScrollPane scrollPane = new JScrollPane(playlist);
+        SongNode temp = songs.getSongs().getHead();
+        while(temp != null) {
+            list.addElement(temp.getSong().getTitle());
+            temp = temp.getSongNext();
+        }
 
         button.addActionListener(e -> {
             songs.playCurrentSong();
             output.setText("Current " + songs.getCurrentSong().toString());
+            playlist.repaint();
+            
         });
 
         pause.addActionListener(e -> {
@@ -63,6 +75,7 @@ public class Main {
             output.setText("Current " + songs.getCurrentSong().toString());
             paused = false;
             pause.setText("Pause");
+            playlist.repaint();
 
         });
 
@@ -71,6 +84,7 @@ public class Main {
             output.setText("Current " + songs.getCurrentSong().toString());
             paused = false;
             pause.setText("Pause");
+            playlist.repaint();
         });
 
         
@@ -89,14 +103,7 @@ public class Main {
             }
             
         });
-        DefaultListModel<String> list = new DefaultListModel<>();
-        JList<String> playlist = new JList<>(list);
-        JScrollPane scrollPane = new JScrollPane(playlist);
-        SongNode temp = songs.getSongs().getHead();
-        while(temp != null) {
-            list.addElement(temp.getSong().getTitle());
-            temp = temp.getSongNext();
-        }
+        
 
         JTextField inputName = new JTextField();
         inputName.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
@@ -131,6 +138,40 @@ public class Main {
             songs.getSongs().removeAt(songs.getCurrentInt());
             
             songs.setCurrentSong(1);
+        });
+
+        playlist.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getClickCount() == 2) {
+                    int ind = playlist.locationToIndex(e.getPoint());
+                    if(ind >= 0) {
+                        String song = list.getElementAt(ind);
+                        int temp = songs.findSongByTitle(song);
+                        songs.setCurrentSong(temp);
+                        songs.stopPlayback();
+                        songs.playCurrentSong();
+                        output.setText("Current " + songs.getCurrentSong().toString());
+                        paused = false;
+                        pause.setText("Pause");
+                        playlist.repaint();
+
+                    }
+                }
+            }
+        });
+
+        playlist.setCellRenderer((jlist, value, index, isSelected, cellHasFocus) -> {
+            JLabel label = new JLabel(value);
+            if(value.equals(songs.getCurrentSong().getSong().getTitle())) {
+                label.setOpaque(true);
+                label.setBackground(Color.LIGHT_GRAY);
+            }
+            else {
+                label.setOpaque(true);
+                label.setBackground(Color.WHITE);
+            }
+            return label;
         });
 
         
@@ -189,4 +230,6 @@ public class Main {
         frame.setVisible(true);
 
     }
+
+    
 }

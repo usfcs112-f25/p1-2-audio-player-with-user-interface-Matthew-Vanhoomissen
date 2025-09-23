@@ -95,7 +95,7 @@ public class Playlist {
      * @params keywork could be for title or artist
      */
     public void searchSongs(String keyword) {
-        if(findSongByTitle(keyword) != null) {
+        if(findSongByTitle(keyword) != 0) {
             System.out.println(findSongByTitle(keyword));
         }
         findSongByArtist(keyword);
@@ -285,15 +285,17 @@ public class Playlist {
      * @params title of song
      * @returns Song if found
      */
-    public Song findSongByTitle(String title) {
+    public int findSongByTitle(String title) {
         SongNode temp = songs.getHead();
+        int counter = 1;
         while(temp != null) {
             if(temp.getSong().getTitle().equalsIgnoreCase(title)) {
-                return temp.getSong();
+                return counter;
             }
+            counter++;
             temp = temp.getSongNext();
         }
-        return null;
+        return 0;
     }
 
     /*
