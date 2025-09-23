@@ -1,6 +1,9 @@
 /*
  * Creates a playlist that a SongLinkedList is stored in
  */
+
+import java.util.ArrayList;
+
 public class Playlist {
     /*
      * Current node and booleans for repeat are stored here
@@ -12,6 +15,8 @@ public class Playlist {
     SongPlayer songPlayer;
     private boolean repeatSong;
     private boolean repeatPlaylist;
+    private ArrayList<Song> prevPlayed = new ArrayList<>();
+    private ArrayList<SongNode> queue = new ArrayList<>();
 
     /*
      * Constructer
@@ -48,6 +53,10 @@ public class Playlist {
         songs.clear();
         currentNode = null;
     }
+
+    public void addToQueue(SongNode song) {
+        queue.add(song);
+    } 
 
     /*
      * Toggles the repeating song/playlist by switching value
@@ -162,12 +171,20 @@ public class Playlist {
         }
         
         try {
+
             System.out.println(partialDuration(currentNode));
+            updateRecentlyPlayed(currentNode.getSong());
         if(songPlayer.playSong(currentNode.getSong(), () -> {
             if(repeatSong) {
                 playCurrentSong();
             }
+            else if(queue.size() > 0) {
+                setCurrentSong(findSongByTitle(queue.get(queue.size() - 1).getSong().getTitle()));
+                queue.remove(queue.size() - 1);
+                playCurrentSong();
+            }
             else {
+
                 playNext();
             }
             
@@ -425,5 +442,24 @@ public class Playlist {
     }
     public String toString() {
         return name;
+    }
+
+    public void updateRecentlyPlayed(Song song) {
+        if(song != null) {
+            prevPlayed.add(song);
+        }
+
+        if(prevPlayed.size() > 2) {
+            prevPlayed.remove(0);
+        }
+    }
+
+    public String getRecentlyPlayed() {
+        String prevPlayed3 = "";
+        for(Song s : prevPlayed) {
+            prevPlayed3 += s.toString();
+            prevPlayed3 += "\n";
+        }
+        return prevPlayed3;
     }
 }

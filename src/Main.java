@@ -36,7 +36,8 @@ public class Main {
         JTextArea output = new JTextArea(5, 20);
 
         
-
+        JLabel label = new JLabel("Recently played: ");
+        JTextArea recentlyPlayed = new JTextArea(5, 20);
         
         JButton button = new JButton("Start");
         JButton pause = new JButton("Pause");
@@ -59,6 +60,7 @@ public class Main {
 
         button.addActionListener(e -> {
             songs.playCurrentSong();
+            recentlyPlayed.setText(songs.getRecentlyPlayed());
             if(songs.getCurrentSong() != null) {
                output.setText("Current " + songs.getCurrentSong().toString()); 
             }
@@ -89,6 +91,8 @@ public class Main {
 
         next.addActionListener(e -> {
             songs.playNext();
+            recentlyPlayed.setText(songs.getRecentlyPlayed());
+
             if(songs.getCurrentSong() != null) {
                output.setText("Current " + songs.getCurrentSong().toString()); 
             }
@@ -100,6 +104,8 @@ public class Main {
 
         prev.addActionListener(e -> {
             songs.playPrev();
+            recentlyPlayed.setText(songs.getRecentlyPlayed());
+
             if(songs.getCurrentSong() != null) {
                output.setText("Current " + songs.getCurrentSong().toString()); 
             }
@@ -175,7 +181,14 @@ public class Main {
         playlist.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(e.getClickCount() == 2) {
+                if(e.getClickCount() == 3) {
+                    int ind = playlist.locationToIndex(e.getPoint());
+                    if(ind >= 0) {
+                        songs.addToQueue(songs.getSongs().get(ind + 1));
+                        System.out.println("Successfully added to queue");
+                    }
+                }
+                else if(e.getClickCount() == 2) {
                     int ind = playlist.locationToIndex(e.getPoint());
                     if(ind >= 0) {
                         String song = list.getElementAt(ind);
@@ -183,6 +196,7 @@ public class Main {
                         songs.setCurrentSong(temp);
                         songs.stopPlayback();
                         songs.playCurrentSong();
+                        recentlyPlayed.setText(songs.getRecentlyPlayed());
                         output.setText("Current " + songs.getCurrentSong().toString());
                         paused = false;
                         pause.setText("Pause");
@@ -190,20 +204,21 @@ public class Main {
 
                     }
                 }
+                
             }
         });
 
         playlist.setCellRenderer((jlist, value, index, isSelected, cellHasFocus) -> {
-            JLabel label = new JLabel(value);
+            JLabel label2 = new JLabel(value);
             if(value.equals(songs.getCurrentSong().getSong().getTitle())) {
-                label.setOpaque(true);
-                label.setBackground(Color.LIGHT_GRAY);
+                label2.setOpaque(true);
+                label2.setBackground(Color.LIGHT_GRAY);
             }
             else {
-                label.setOpaque(true);
-                label.setBackground(Color.WHITE);
+                label2.setOpaque(true);
+                label2.setBackground(Color.WHITE);
             }
-            return label;
+            return label2;
         });
 
         JButton exit = new JButton("Quit");
@@ -403,8 +418,7 @@ public class Main {
             }
         });
 
-        JLabel label = new JLabel("Recently played: ");
-        JTextArea recentlyPlayed = new JTextArea(5, 20);
+    
 
         JPanel leftSide = new JPanel(new FlowLayout(FlowLayout.LEFT));
         leftSide.add(menu);
