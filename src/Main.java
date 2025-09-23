@@ -21,6 +21,7 @@ public class Main {
     public static String filePath = "";
     public static boolean muted = false;
     public static Playlist songs = new Playlist("Playlist1");
+    
     public static void main(String[] args) {
         ArrayList<Playlist> playlists = new ArrayList<>();
         
@@ -439,6 +440,35 @@ public class Main {
                 }
             }
         });
+        JPanel hidden = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        hidden.setVisible(false);
+
+        JCheckBox shuffle = new JCheckBox();
+        JLabel shuffle2 = new JLabel("Shuffle");
+
+        JCheckBox smartShuffle = new JCheckBox();
+        JLabel smartShuffle2 = new JLabel("Smart shuffle");
+
+        hidden.add(smartShuffle2);
+        hidden.add(smartShuffle);
+        shuffle.addActionListener(e -> {
+            songs.toggleShuffle();
+            hidden.setVisible(shuffle.isSelected());
+            hidden.revalidate();
+            hidden.repaint();
+        });
+
+        smartShuffle.addActionListener(e -> {
+            if(smartShuffle.isSelected()) {
+                songs.makeSmartPlaylist();
+                songs.toggleSmartShuffle(true);
+            }
+            else {
+                songs.toggleSmartShuffle(false);
+            }
+            
+            
+        });
 
     
 
@@ -455,6 +485,10 @@ public class Main {
         JPanel leftRow2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         leftRow2.add(repeatPlaylist);
         leftRow2.add(repeatingPlaylist);
+
+        JPanel leftRow2_5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftRow2_5.add(shuffle2);
+        leftRow2_5.add(shuffle);
 
         JPanel leftRow3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         leftRow3.add(slider);
@@ -525,6 +559,8 @@ public class Main {
         left.add(leftSide);
         left.add(leftRow1);
         left.add(leftRow2);
+        left.add(leftRow2_5);
+        left.add(hidden);
         left.add(leftRow3);
         left.add(leftRow4);
         

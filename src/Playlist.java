@@ -17,6 +17,9 @@ public class Playlist {
     private boolean repeatPlaylist;
     private ArrayList<Song> prevPlayed = new ArrayList<>();
     private ArrayList<SongNode> queue = new ArrayList<>();
+    private boolean shuffling = false;
+    private boolean smartShuffling = false;
+    private ArrayList<SongNode> notPlayed = new ArrayList<>();
 
     /*
      * Constructer
@@ -51,6 +54,7 @@ public class Playlist {
     public int getCurrentInt() {
         return currentInt;
     }
+
     
     public void clearSongs() {
         songs.clear();
@@ -60,6 +64,26 @@ public class Playlist {
     public void addToQueue(SongNode song) {
         queue.add(song);
     } 
+
+    public void toggleShuffle() {
+        shuffling = !shuffling;
+    }
+
+    public void makeSmartPlaylist() {
+        
+        notPlayed.clear();
+        SongNode temp = songs.getHead();
+        while(temp != null) {
+            notPlayed.add(temp);
+            temp = temp.getSongNext();
+        }
+    }
+
+    public void toggleSmartShuffle(boolean onOff) {
+        smartShuffling = onOff;
+        System.out.println("Smart shuffle on: " + smartShuffling);
+    }
+    
 
     /*
      * Toggles the repeating song/playlist by switching value
@@ -178,7 +202,29 @@ public class Playlist {
             System.out.println(partialDuration(currentNode));
             updateRecentlyPlayed(currentNode.getSong());
         if(songPlayer.playSong(currentNode.getSong(), () -> {
-            if(repeatSong) {
+            if(shuffling) {
+                if(smartShuffling) {
+                    while(true) {
+                        if(notPlayed.size() == 0) {
+                            smartShuffling = false;
+                            playRandom();
+                            break;
+                        }
+                        playRandom();
+                        if(notPlayed.contains(currentNode)) {
+                            notPlayed.remove(currentNode);
+                            break;
+                        }
+                        stopPlayback();
+                    }
+                    
+                }
+                else {
+                    playRandom();
+                }
+                
+            }
+            else if(repeatSong) {
                 playCurrentSong();
             }
             else if(queue.size() > 0) {
