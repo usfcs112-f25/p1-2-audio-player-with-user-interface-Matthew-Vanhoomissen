@@ -278,6 +278,14 @@ public class Main {
                         if(p.getName().equals(name)) {
                             songs = p;
                             System.out.println("Playlist switched");
+                            for(int i = list.size() - 1; i >= 0; i--) {
+                                list.remove(i);
+                            }
+                            SongNode temp4 = songs.getSongs().getHead();
+                            while(temp4 != null) {
+                                list.addElement(temp4.getSong().getTitle());
+                                temp4 = temp4.getSongNext();
+                            }
                             break;
                         }
                     }
