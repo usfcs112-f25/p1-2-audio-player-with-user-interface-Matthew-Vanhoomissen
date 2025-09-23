@@ -140,6 +140,14 @@ public class Main {
             songs.setCurrentSong(1);
         });
 
+        JButton clear = new JButton("Clear songs");
+        clear.addActionListener(e -> {
+            songs.getSongs().clear();
+            output.setText("");
+        });
+
+
+
         playlist.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -172,6 +180,11 @@ public class Main {
                 label.setBackground(Color.WHITE);
             }
             return label;
+        });
+
+        JButton exit = new JButton("Quit");
+        exit.addActionListener(e -> {
+            System.exit(1);
         });
 
         
@@ -216,6 +229,7 @@ public class Main {
         right.add(inputGenre);
         right.add(rightSide);
         right.add(scrollPane);
+        right.add(exit);
 
 
         frame.setLayout(new BorderLayout());
