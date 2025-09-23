@@ -46,6 +46,38 @@ public class SongLinkedList {
         
         
     }
+    public void insertBefore(int index, Song song) {
+        SongNode temp = get(index);
+        SongNode newSong = new SongNode(song);
+        if(temp == null) {
+            System.out.println("Invalid index");
+            return;
+        }
+        if(temp.getPrev() == null) {
+            addFirst(song);
+        } 
+        
+        temp.getPrev().setNext(newSong);
+        
+        newSong.setNext(temp);
+        newSong.setPrev(temp.getPrev());
+        temp.setPrev(newSong);
+    }
+
+    public void insertAfter(int index, Song song) {
+        SongNode temp = get(index);
+        SongNode newSong = new SongNode(song);
+        if(temp == null) {
+            System.out.println("Invalid index");
+        }
+        if(temp.getSongNext() == null) {
+            addLast(song);
+        }
+        newSong.setPrev(temp);
+        newSong.setNext(temp.getSongNext());
+        temp.setNext(newSong);
+        newSong.getSongNext().setPrev(newSong);
+    }
     /*
      * Adds at index
      * @params index and song 
@@ -141,9 +173,18 @@ public class SongLinkedList {
      * Clears the linkedlist
      */
     public void clear() {
+        SongNode start = head;
+        while(start != null) {
+            SongNode temp = start.getSongNext();
+            start.setPrev(null);
+            start.setNext(null);
+            start = temp;
+        }
+        
         head = null;
         tail = null;
         size = 0;
+        
     }
 
     /*

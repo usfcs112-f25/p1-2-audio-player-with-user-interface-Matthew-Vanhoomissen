@@ -45,7 +45,10 @@ public class Main {
 
         button.addActionListener(e -> {
             songs.playCurrentSong();
-            output.setText("Current " + songs.getCurrentSong().toString());
+            if(songs.getCurrentSong() != null) {
+               output.setText("Current " + songs.getCurrentSong().toString()); 
+            }
+            
             playlist.repaint();
             
         });
@@ -72,7 +75,9 @@ public class Main {
 
         next.addActionListener(e -> {
             songs.playNext();
-            output.setText("Current " + songs.getCurrentSong().toString());
+            if(songs.getCurrentSong() != null) {
+               output.setText("Current " + songs.getCurrentSong().toString()); 
+            }
             paused = false;
             pause.setText("Pause");
             playlist.repaint();
@@ -81,7 +86,9 @@ public class Main {
 
         prev.addActionListener(e -> {
             songs.playPrev();
-            output.setText("Current " + songs.getCurrentSong().toString());
+            if(songs.getCurrentSong() != null) {
+               output.setText("Current " + songs.getCurrentSong().toString()); 
+            }
             paused = false;
             pause.setText("Pause");
             playlist.repaint();
@@ -142,8 +149,11 @@ public class Main {
 
         JButton clear = new JButton("Clear songs");
         clear.addActionListener(e -> {
-            songs.getSongs().clear();
+            songs.clearSongs();
             output.setText("");
+            for(int i = list.size() - 1; i >= 0; i--) {
+                list.remove(i);
+            } 
         });
 
 
@@ -208,6 +218,7 @@ public class Main {
 
         JPanel row5 = new JPanel(new FlowLayout(FlowLayout.CENTER));
         row5.add(remove);
+        row5.add(clear);
         
 
         JPanel rightSide = new JPanel(new FlowLayout(FlowLayout.CENTER));

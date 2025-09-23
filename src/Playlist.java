@@ -42,6 +42,11 @@ public class Playlist {
     public int getCurrentInt() {
         return currentInt;
     }
+    
+    public void clearSongs() {
+        songs.clear();
+        currentNode = null;
+    }
 
     /*
      * Toggles the repeating song/playlist by switching value
