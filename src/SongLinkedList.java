@@ -46,6 +46,16 @@ public class SongLinkedList {
         
         
     }
+
+    public void swapNodes(int index1, int index2) {
+        if(get(index1) == null || get(index2) == null) {
+            System.out.println("Invalid index");
+        }
+        Song data = get(index1).getSong();
+        get(index1).setSong(get(index2).getSong());
+        get(index2).setSong(data);
+    }
+
     public void insertBefore(int index, Song song) {
         SongNode temp = get(index);
         SongNode newSong = new SongNode(song);

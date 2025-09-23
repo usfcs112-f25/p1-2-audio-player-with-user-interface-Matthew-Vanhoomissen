@@ -2,7 +2,13 @@ import javax.swing.border.Border;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.awt.event.MouseEvent;
 
 public class Main {
@@ -13,7 +19,9 @@ public class Main {
     public static String genre;
     public static String filePath = "";
     public static void main(String[] args) {
-        Playlist songs = new Playlist();
+        ArrayList<Playlist> playlists = new ArrayList<>();
+        Playlist songs = new Playlist("Playlist1");
+        playlists.add(songs);
         SongPlayer songPlayer = songs.getSongPlayer();
         songs.addSong(new Song("Test1", "T", 10, "T", "../music/running-night-393139.mp3"));
         songs.addSong(new Song("Test2", "T", 10, "T", "../music/file_example_WAV_1MG.wav"));
@@ -31,6 +39,7 @@ public class Main {
 
         JPanel test = new JPanel();
         JPanel right = new JPanel();
+        JPanel left = new JPanel();
         
         test.add(button, BorderLayout.SOUTH);
 
@@ -197,6 +206,57 @@ public class Main {
             System.exit(1);
         });
 
+        JComboBox menu = new JComboBox<>(new String[]{"Menu Options","New Playlist", "Load playlist", "Save playlist"});
+        menu.setPreferredSize(new Dimension(120, 25));
+
+        
+        DefaultComboBoxModel<String> playlistNames = new DefaultComboBoxModel<>();
+        JComboBox editPlaylist = new JComboBox<>(playlistNames);
+        for(Playlist p : playlists) {
+            playlistNames.addElement(p.toString());
+            
+        }
+
+        editPlaylist.setPreferredSize(new Dimension(120, 25));
+
+        JButton topLeftSubmit = new JButton("Enter");
+        topLeftSubmit.setPreferredSize(new Dimension(70, 25));
+
+        topLeftSubmit.addActionListener(e -> {
+            if(menu.getSelectedItem().equals("New Playlist")) {
+                String inputN = JOptionPane.showInputDialog(frame, "Enter new playlist name: ");
+                if(inputN != null) {
+                    playlists.add(new Playlist(inputN));
+                    playlistNames.addElement(inputN);
+                }
+            }
+            else if(menu.getSelectedItem().equals("Save playlist")) {
+                String inputF = JOptionPane.showInputDialog(frame, "Enter file name to save to: ");
+                if(inputF !=null) {
+                    saveToFile(songs, inputF, output);
+                } 
+            }
+            else if(menu.getSelectedItem().equals("Load playlist")) {
+                String inputL = JOptionPane.showInputDialog(frame, "Enter a name to load playlist");
+                if(inputL != null) {
+                    JFileChooser fileChoice = new JFileChooser();
+                    int choice = fileChoice.showOpenDialog(frame);
+                    if(choice == JFileChooser.APPROVE_OPTION) {
+                        File chosenFile = fileChoice.getSelectedFile();
+                        filePath = chosenFile.getAbsolutePath();
+                        playlists.add(createPlaylist(loadPlaylist(filePath, output), inputL, output));
+                        playlistNames.addElement(inputL);
+                        
+                    }
+                }
+            }
+        });
+
+
+        JPanel leftSide = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        leftSide.add(menu);
+        leftSide.add(editPlaylist);
+        leftSide.add(topLeftSubmit);
         
         
 
@@ -242,6 +302,9 @@ public class Main {
         right.add(scrollPane);
         right.add(exit);
 
+        left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
+        left.add(leftSide);
+
 
         frame.setLayout(new BorderLayout());
 
@@ -249,6 +312,7 @@ public class Main {
         
         frame.add(test, BorderLayout.CENTER);
         frame.add(right, BorderLayout.EAST);
+        frame.add(left, BorderLayout.WEST);
      
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 400);
@@ -256,5 +320,72 @@ public class Main {
 
     }
 
-    
+    public static void saveToFile(Playlist songs, String filePath, JTextArea output) {
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter("../playlists/" + filePath));
+            SongNode temp = songs.getSongs().getHead();
+            while(temp != null) {
+                Song s = temp.getSong();
+                String writing = s.getTitle() + "," + s.getArtist() + ","+ s.getDuration() + "," + s.getGenre() + "," + s.getFilePath(); 
+                writer.write(writing);
+                writer.newLine();
+                temp = temp.getSongNext();
+            }
+        }
+        catch(IOException e) {
+            output.setText(e.getMessage());
+        }
+        finally {
+            if(writer != null) {
+                try {
+                    writer.close();
+                }
+                catch(IOException e) {
+                    output.setText(e.getMessage());
+                }
+            }
+        }
+    }
+
+    public static Playlist createPlaylist(ArrayList<String> lines, String name, JTextArea output) {
+        Playlist temp = new Playlist(name);
+        for(String s : lines) {
+            try {
+                String[] items = s.split(",");
+                temp.addSong(new Song(items[0], items[1], Integer.parseInt(items[2]), items[3], items[4]));   
+            }
+            catch(NumberFormatException e) {
+                output.setText(e.getMessage());
+            }
+        }
+        return temp;
+    }
+
+    public static ArrayList<String> loadPlaylist(String file, JTextArea output) {
+        BufferedReader reader = null;
+        ArrayList<String> lines = new ArrayList<>();
+        String line = "";
+
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            while((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+        catch(IOException e) {
+            output.setText(e.getMessage());
+        }
+        finally {
+            if(reader != null) {
+                try {
+                    reader.close();
+                }
+                catch(IOException e) {
+                    output.setText(e.getMessage());
+                }
+            }
+        }
+        return lines;
+    }
 }

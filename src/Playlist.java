@@ -6,7 +6,7 @@ public class Playlist {
      * Current node and booleans for repeat are stored here
      */
     private SongLinkedList songs;
-    
+    private String name;
     private SongNode currentNode;
     private int currentInt;
     SongPlayer songPlayer;
@@ -16,13 +16,14 @@ public class Playlist {
     /*
      * Constructer
      */
-    public Playlist() {
+    public Playlist(String name) {
         songs = new SongLinkedList();
         currentNode = null;
         currentInt = 1;
         songPlayer = new SongPlayer();
         repeatSong = false;
         repeatPlaylist = false;
+        this.name = name;
     }
     /*
      * returns each respective value
@@ -339,7 +340,7 @@ public class Playlist {
      * @returns playlist sorted
      */
     public Playlist sortPlaylistByDuration(Playlist playlist) {
-        Playlist sorted = new Playlist();
+        Playlist sorted = new Playlist("");
         SongNode temp = playlist.getSongs().getHead();
         while(temp != null) {
             if(sorted.getSongs().getHead() == null) {
@@ -421,5 +422,8 @@ public class Playlist {
             current = current.getSongNext();
         }
         return removed;
+    }
+    public String toString() {
+        return name;
     }
 }
