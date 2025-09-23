@@ -403,6 +403,9 @@ public class Main {
             }
         });
 
+        JLabel label = new JLabel("Recently played: ");
+        JTextArea recentlyPlayed = new JTextArea(5, 20);
+
         JPanel leftSide = new JPanel(new FlowLayout(FlowLayout.LEFT));
         leftSide.add(menu);
         leftSide.add(editPlaylist);
@@ -422,8 +425,13 @@ public class Main {
         leftRow3.add(mute);
 
         JPanel leftRow4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        leftRow4.add(sort);
-        leftRow4.add(sortEnter);
+        leftRow4.add(label);
+        leftRow4.add(recentlyPlayed);
+
+
+        JPanel rightRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        rightRow.add(sort);
+        rightRow.add(sortEnter);
         
 
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -463,6 +471,7 @@ public class Main {
         test.add(row3);
         test.add(row4);
         test.add(row5);
+        
 
 
         right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
@@ -471,6 +480,7 @@ public class Main {
         right.add(inputDuration);
         right.add(inputGenre);
         right.add(rightSide);
+        right.add(rightRow);
         right.add(scrollPane);
         right.add(exit);
 
@@ -481,6 +491,7 @@ public class Main {
         left.add(leftRow2);
         left.add(leftRow3);
         left.add(leftRow4);
+        
 
 
         frame.setLayout(new BorderLayout());
