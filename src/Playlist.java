@@ -4,6 +4,8 @@
 
 import java.util.ArrayList;
 
+import javax.swing.JProgressBar;
+
 public class Playlist {
     /*
      * Current node and booleans for repeat are stored here
@@ -24,11 +26,11 @@ public class Playlist {
     /*
      * Constructer
      */
-    public Playlist(String name) {
+    public Playlist(String name, JProgressBar progressBar) {
         songs = new SongLinkedList();
         currentNode = null;
         currentInt = 1;
-        songPlayer = new SongPlayer();
+        songPlayer = new SongPlayer(progressBar);
         repeatSong = false;
         repeatPlaylist = false;
         this.name = name;
@@ -406,7 +408,7 @@ public class Playlist {
      * @returns playlist sorted
      */
     public Playlist sortPlaylistByDuration(Playlist playlist) {
-        Playlist sorted = new Playlist("");
+        Playlist sorted = new Playlist("", null);
         SongNode temp = playlist.getSongs().getHead();
         while(temp != null) {
             if(sorted.getSongs().getHead() == null) {

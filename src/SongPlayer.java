@@ -1,12 +1,22 @@
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import java.io.File;
+import javafx.util.Duration;
+
+import javax.swing.*;
+import javax.swing.JProgressBar;
 
 /*
  * Song player used to take in sound file and play sound
  */
 public class SongPlayer {
     private MediaPlayer mediaPlayer;
+    private JProgressBar progressBar;
+
+    public SongPlayer(JProgressBar progressBar) {
+        this.progressBar = progressBar;
+        this.progressBar.setStringPainted(true);
+    }
 
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
@@ -28,6 +38,21 @@ public class SongPlayer {
             
             mediaPlayer.setOnEndOfMedia(whenSongEnds);
             
+            mediaPlayer.setOnReady(() -> {
+                Duration total = mediaPlayer.getMedia().getDuration();
+                progressBar.setMinimum(0);
+                progressBar.setMaximum((int) total.toSeconds());
+            });
+
+            mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+                SwingUtilities.invokeLater(() -> {
+                    if(mediaPlayer != null) {
+                        Duration total = mediaPlayer.getMedia().getDuration();
+                        progressBar.setValue((int) newTime.toSeconds());
+                        progressBar.setString(formatTime(newTime) + "/" + formatTime(total));
+                    }
+                });
+            });
 
             mediaPlayer.play();
             return true;
@@ -38,6 +63,10 @@ public class SongPlayer {
             
         }
         
+    }
+
+    public JProgressBar getProgress() {
+        return progressBar;
     }
 
     /*
@@ -100,6 +129,17 @@ public class SongPlayer {
             return;
         }
         mediaPlayer.setVolume(vol);
+    }
+
+    public void setSpeed(double speed) {
+        mediaPlayer.setRate(speed);
+    }
+
+    public String formatTime(Duration d) {
+        int secs = (int) d.toSeconds();
+        int mins = secs / 60;
+        secs = secs % 60;
+        return String.format("%02d:%02d", mins, secs);
     }
 
 }

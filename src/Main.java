@@ -20,7 +20,8 @@ public class Main {
     public static String genre;
     public static String filePath = "";
     public static boolean muted = false;
-    public static Playlist songs = new Playlist("Playlist1");
+    public static JProgressBar progressBar = new JProgressBar();
+    public static Playlist songs = new Playlist("Playlist1", progressBar);
     
     public static void main(String[] args) {
         ArrayList<Playlist> playlists = new ArrayList<>();
@@ -59,6 +60,10 @@ public class Main {
             list.addElement(temp.getSong().getTitle());
             temp = temp.getSongNext();
         }
+
+        playlist.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        playlist.setDragEnabled(true);
+        playlist.setDropMode(DropMode.INSERT);
 
         button.addActionListener(e -> {
             songs.playCurrentSong();
@@ -248,7 +253,7 @@ public class Main {
             if(menu.getSelectedItem().equals("New Playlist")) {
                 String inputN = JOptionPane.showInputDialog(frame, "Enter new playlist name: ");
                 if(inputN != null) {
-                    playlists.add(new Playlist(inputN));
+                    playlists.add(new Playlist(inputN, progressBar));
                     playlistNames.addElement(inputN);
                 }
             }
@@ -470,6 +475,64 @@ public class Main {
             
         });
 
+        JComboBox crossPlaylist = new JComboBox<>(new String[]{"Cross Playlist", "Move current song", "Copy and paste current song"});
+        JButton crossButton = new JButton("Sent");
+
+        crossButton.addActionListener(e -> {
+            if(!crossPlaylist.getSelectedItem().equals("Cross Playlist")) {
+                String inputC = JOptionPane.showInputDialog(frame, "Enter playlist to move song to"); 
+                if(crossPlaylist.getSelectedItem().equals("Move current song")) {
+                    for(Playlist p : playlists) {
+                        if(p.getName().equals(inputC) && !songs.getName().equals(inputC)) {
+                            p.addSong(songs.getCurrentSong().getSong());
+                            songs.getSongs().removeAt(songs.getCurrentInt());
+                            songs.setCurrentSong(1);
+
+                            for(int i = list.size() - 1 ; i >= 0; i--) {
+                                if(list.get(i).equals(songs.getSongs().get(songs.getCurrentInt()).getSong().getTitle())) {
+                                    list.remove(i);
+                                }
+                            }
+                            SongNode temp0 = songs.getSongs().getHead();
+                            while(temp0 != null) {
+                                list.addElement(temp0.getSong().getTitle());
+                                temp0 = temp0.getSongNext();
+                            }
+                            playlist.repaint();
+                            break;
+                        }
+                    } 
+                }
+                else {
+                    for(Playlist p : playlists) {
+                        if(p.getName().equals(inputC) && !songs.getName().equals(inputC)) {
+                            p.addSong(songs.getCurrentSong().getSong());
+                            break;
+                        }
+                    }    
+                }
+            }
+            
+
+        });
+
+        JSlider speed = new JSlider(0, 2, 1);
+        JLabel speedLabel = new JLabel("Playback speed");
+
+        speed.addChangeListener(e -> {
+            if(speed.getValue() == 0) {
+                songPlayer.setSpeed(.5);
+            }
+            else if(speed.getValue() == 1) {
+                songPlayer.setSpeed(1);
+            }
+            else {
+                songPlayer.setSpeed(2);
+            }
+        });
+
+       
+
     
 
         JPanel leftSide = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -494,9 +557,17 @@ public class Main {
         leftRow3.add(slider);
         leftRow3.add(mute);
 
+        JPanel leftRow3_5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftRow3_5.add(speed);
+        leftRow3_5.add(speedLabel);
+
         JPanel leftRow4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         leftRow4.add(label);
         leftRow4.add(recentlyPlayed);
+
+        JPanel leftRow5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftRow5.add(crossPlaylist);
+        leftRow5.add(crossButton);
 
 
         JPanel rightRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -511,6 +582,10 @@ public class Main {
         
         row2.add(input);
         
+        JPanel row2_25 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        if(progressBar != null) {
+            row2_25.add(progressBar);
+        }
 
         JPanel row2_5 = new JPanel(new FlowLayout(FlowLayout.CENTER));
         row2_5.add(search);
@@ -537,6 +612,7 @@ public class Main {
         test.setLayout(new BoxLayout(test, BoxLayout.Y_AXIS));
         test.add(row1);
         test.add(row2);
+        test.add(row2_25);
         test.add(row2_5);
         test.add(row3);
         test.add(row4);
@@ -562,7 +638,9 @@ public class Main {
         left.add(leftRow2_5);
         left.add(hidden);
         left.add(leftRow3);
+        left.add(leftRow3_5);
         left.add(leftRow4);
+        left.add(leftRow5);
         
 
 
@@ -609,7 +687,7 @@ public class Main {
     }
 
     public static Playlist createPlaylist(ArrayList<String> lines, String name, JTextArea output) {
-        Playlist temp = new Playlist(name);
+        Playlist temp = new Playlist(name, progressBar);
         for(String s : lines) {
             try {
                 String[] items = s.split(",");
