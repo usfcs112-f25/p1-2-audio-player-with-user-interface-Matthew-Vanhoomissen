@@ -621,6 +621,10 @@ public class Main {
                             songs.setCurrentSong(1);
 
                             for(int i = list.size() - 1 ; i >= 0; i--) {
+                                if(list.size() <= 1) {
+                                    list.remove(i);
+                                    continue;
+                                }
                                 if(list.get(i).equals(songs.getSongs().get(songs.getCurrentInt()).getSong().getTitle())) {
                                     list.remove(i);
                                 }
