@@ -1,6 +1,9 @@
 import javax.swing.border.Border;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.MouseAdapter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -64,6 +67,51 @@ public class Main {
         playlist.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         playlist.setDragEnabled(true);
         playlist.setDropMode(DropMode.INSERT);
+        playlist.setTransferHandler(new TransferHandler() {
+            private int prevIndex = -1;
+
+            @Override
+            public int getSourceActions(JComponent c) {
+                return MOVE;
+            }
+
+            @Override
+            public Transferable createTransferable(JComponent c) {
+                prevIndex = playlist.getSelectedIndex();
+                return new StringSelection(playlist.getSelectedValue());
+            }
+
+            @Override
+            public boolean canImport(TransferSupport support) {
+                return support.isDataFlavorSupported(DataFlavor.stringFlavor);
+            }
+
+            @Override 
+            public boolean importData(TransferSupport support) {
+                try {
+                    JList.DropLocation location1 = (JList.DropLocation) support.getDropLocation();
+                    int index = location1.getIndex();
+
+                    if(prevIndex != -1 && index != prevIndex) {
+                        String element = list.getElementAt(prevIndex);
+                        list.remove(prevIndex);
+
+                        if(index > prevIndex) {
+                            index--;
+                        }
+
+                        list.add(index, element);
+                        playlist.setSelectedIndex(index);
+                        return true;
+                    } 
+
+                }
+                catch(Exception e) {
+                    output.setText(e.getMessage());
+                }
+                return false;
+            }
+        });
 
         button.addActionListener(e -> {
             songs.playCurrentSong();
