@@ -195,6 +195,7 @@ public class Main {
         JButton prev = new JButton("Prev");
 
         next.addActionListener(e -> {
+            songs.stopPlayback();
             songs.playNext();
             recentlyPlayed.setText(songs.getRecentlyPlayed());
 
@@ -209,6 +210,7 @@ public class Main {
 
         //goes to previous song
         prev.addActionListener(e -> {
+            songs.stopPlayback();
             songs.playPrev();
             recentlyPlayed.setText(songs.getRecentlyPlayed());
 
