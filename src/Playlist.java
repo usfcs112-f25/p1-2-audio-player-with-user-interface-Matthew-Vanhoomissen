@@ -3,12 +3,14 @@
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JProgressBar;
 
 public class Playlist {
     /*
      * Current node and booleans for repeat are stored here
+     * Stores arraylists for the songs if they were played or need to be in queue
      */
     private SongLinkedList songs;
     private String name;
@@ -25,6 +27,7 @@ public class Playlist {
 
     /*
      * Constructer
+     * @params the name of playlist and the progress bar which is needed to keep track of data
      */
     public Playlist(String name, JProgressBar progressBar) {
         songs = new SongLinkedList();
@@ -56,6 +59,15 @@ public class Playlist {
     public int getCurrentInt() {
         return currentInt;
     }
+    public ArrayList<Song> getPrevPlayed() {
+        return prevPlayed;
+    }
+    public ArrayList<SongNode> getQueue() {
+        return queue;
+    }
+    public ArrayList<SongNode> getNotPLayed() {
+        return notPlayed;
+    }
 
     
     public void clearSongs() {
@@ -71,6 +83,8 @@ public class Playlist {
         shuffling = !shuffling;
     }
 
+    //Makes an arraylist of the songs
+    //When the songs are played it removes from list
     public void makeSmartPlaylist() {
         
         notPlayed.clear();
@@ -81,6 +95,8 @@ public class Playlist {
         }
     }
 
+    //Toggles on or off
+    //@params boolean to set to
     public void toggleSmartShuffle(boolean onOff) {
         smartShuffling = onOff;
         System.out.println("Smart shuffle on: " + smartShuffling);
@@ -204,6 +220,11 @@ public class Playlist {
             System.out.println(partialDuration(currentNode));
             updateRecentlyPlayed(currentNode.getSong());
         if(songPlayer.playSong(currentNode.getSong(), () -> {
+            /*
+             * If shuffling on, it will play random
+             * Unless smart shuffle is on and only plays the songs in the ArrayList
+             * Once played it will remove it from the list until it is at 0 and turns it off
+             */
             if(shuffling) {
                 if(smartShuffling) {
                     while(true) {
@@ -334,6 +355,7 @@ public class Playlist {
         }
     }
 
+    //Plays previous song
     public void playPrev() {
         if(currentNode != null && currentNode.getPrev() != null) {
             currentNode = currentNode.getPrev();
@@ -491,10 +513,17 @@ public class Playlist {
         }
         return removed;
     }
+    /*
+     * @returns the name as String
+     */
     public String toString() {
         return name;
     }
 
+    /*
+     * Cycles the songs in the arraylist to only keep the two most previous songs inside
+     * @params song that was just played
+     */
     public void updateRecentlyPlayed(Song song) {
         if(song != null) {
             prevPlayed.add(song);
@@ -505,6 +534,9 @@ public class Playlist {
         }
     }
 
+    /*
+     * @returns the previously played songs in String form
+     */
     public String getRecentlyPlayed() {
         String prevPlayed3 = "";
         for(Song s : prevPlayed) {
@@ -512,5 +544,34 @@ public class Playlist {
             prevPlayed3 += "\n";
         }
         return prevPlayed3;
+    }
+
+    /*
+     * Inserts song into arraylist which is then sorted
+     * The sorted arraylist is then added in order to the playlist
+     * @params song that is added
+     */
+    public void insertSort(Song song) {
+        ArrayList<String> allSongs = new ArrayList<>();
+        ArrayList<Song> saveSongs = new ArrayList<>();
+        SongNode head = songs.getHead();
+        while(head != null) {
+            allSongs.add(head.getSong().getTitle());
+            saveSongs.add(head.getSong());
+            head = head.getSongNext();
+        }
+        allSongs.add(song.getTitle());
+        Collections.sort(allSongs);
+
+        clearSongs();
+
+        for(int i = 0; i < allSongs.size(); i++) {
+            for(Song s : saveSongs) {
+                if(s.getTitle().equals(allSongs.get(i))) {
+                    songs.addLast(s);
+                }
+            }
+        }
+
     }
 }

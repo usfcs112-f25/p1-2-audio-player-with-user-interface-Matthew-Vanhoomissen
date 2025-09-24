@@ -16,6 +16,10 @@ import java.util.Collections;
 import java.awt.event.MouseEvent;
 
 public class Main {
+    /*
+     * Creates static variables that are used inside addActionListeners
+     * Or global variables that need to get changed
+     */
     public static boolean paused = false;
     public static String name;
     public static String artist;
@@ -26,17 +30,24 @@ public class Main {
     public static JProgressBar progressBar = new JProgressBar();
     public static Playlist songs = new Playlist("Playlist1", progressBar);
     
+    /*
+     * Main method that generates the GUI and processes requests
+     */
     public static void main(String[] args) {
+        /*
+         * Creates an ArrayList of playlists to store the playlists used in the program
+         * You can save a playlist to a file but this is the preset playlist
+         * 
+         */
         ArrayList<Playlist> playlists = new ArrayList<>();
         
         playlists.add(songs);
         SongPlayer songPlayer = songs.getSongPlayer();
-        songs.addSong(new Song("Test1", "T", 10, "T", "../music/running-night-393139.mp3"));
-        songs.addSong(new Song("Test2", "T", 20, "T", "../music/file_example_WAV_1MG.wav"));
-
-
         
-
+        /*
+         * Variables or components that are utilized throughout the program
+         * The three columns of components are first initialized here
+         */
         JFrame frame = new JFrame("Spotify Playlist (Swing)");
 
         JTextArea output = new JTextArea(5, 20);
@@ -55,6 +66,9 @@ public class Main {
         
         test.add(button, BorderLayout.SOUTH);
 
+        /*
+         * Creates a JList that displays all the songs in the playlist
+         */
         DefaultListModel<String> list = new DefaultListModel<>();
         JList<String> playlist = new JList<>(list);
         JScrollPane scrollPane = new JScrollPane(playlist);
@@ -64,28 +78,53 @@ public class Main {
             temp = temp.getSongNext();
         }
 
+        /*
+         * Enables the ability to drag on drop items in the JList
+         * by creating a new TransferHandler
+         */
         playlist.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         playlist.setDragEnabled(true);
         playlist.setDropMode(DropMode.INSERT);
         playlist.setTransferHandler(new TransferHandler() {
+            //Sets previous index
             private int prevIndex = -1;
 
+            //Gets where the item is getting moved to
+            /*
+             * @returns the int location
+             * @params is the component that is being moved
+             */
             @Override
             public int getSourceActions(JComponent c) {
                 return MOVE;
             }
 
+            //Creates a transferable object that makes the data able to change location
+            /*
+             * @returns the Transferable object
+             * @params is the componenet that the data needs to get transfered from
+             */
             @Override
             public Transferable createTransferable(JComponent c) {
                 prevIndex = playlist.getSelectedIndex();
                 return new StringSelection(playlist.getSelectedValue());
             }
 
+            //Finds whether the data being transfered is supported in the TransferHandler
+            /*
+             * @returns boolean if the data type is supported
+             * @params an extention of the TransferHandler that determins suitability of transfer
+             */
             @Override
             public boolean canImport(TransferSupport support) {
                 return support.isDataFlavorSupported(DataFlavor.stringFlavor);
             }
 
+            //Imports the data and component and changes the location along with the data
+            /*
+             * @returns boolean if the data is imported and transfered correctly
+             * @params same as above
+             */
             @Override 
             public boolean importData(TransferSupport support) {
                 try {
@@ -113,6 +152,9 @@ public class Main {
             }
         });
 
+        /*
+         * When button clicked the current song is played and the song is output on the screen
+         */
         button.addActionListener(e -> {
             songs.playCurrentSong();
             recentlyPlayed.setText(songs.getRecentlyPlayed());
@@ -124,6 +166,7 @@ public class Main {
             
         });
 
+        //Pauses song and if pressed it toggles between paused and unpaused
         pause.addActionListener(e -> {
             if(paused) {
                 pause.setText("Pause");
@@ -137,10 +180,15 @@ public class Main {
             paused = !paused;
         });
 
+        //Stops song being played also retoggles the pause button
         stop.addActionListener(e -> {
             songs.getSongPlayer().stopSong();
+            paused = false;
+            pause.setText("Pause");
+            playlist.repaint();
         });
 
+        //Goes to next song and retoggles pause button
         JButton next = new JButton("Next");
         JButton prev = new JButton("Prev");
 
@@ -157,6 +205,7 @@ public class Main {
 
         });
 
+        //goes to previous song
         prev.addActionListener(e -> {
             songs.playPrev();
             recentlyPlayed.setText(songs.getRecentlyPlayed());
@@ -170,7 +219,7 @@ public class Main {
         });
 
         
-
+        //Allows selection of file from computer and saves filepath to String
         JButton file = new JButton("Select file");
 
         file.addActionListener(e -> {
@@ -187,13 +236,15 @@ public class Main {
         });
         
 
-        JTextField inputName = new JTextField();
+        //Creates a new song if all items are input correctly
+        //@throws NumberFormatException if invalid duration is put in
+        JTextField inputName = new JTextField("Enter name(delete this text)");
         inputName.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        JTextField inputArtist = new JTextField();
+        JTextField inputArtist = new JTextField("Enter artist");
         inputArtist.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        JTextField inputDuration = new JTextField();
+        JTextField inputDuration = new JTextField("Enter duration");
         inputDuration.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        JTextField inputGenre = new JTextField();
+        JTextField inputGenre = new JTextField("Enter genre");
         inputGenre.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         JButton submit = new JButton("Add song");
 
@@ -202,13 +253,20 @@ public class Main {
                 output.setText("Could not add new song. Input box left blank");                
             }
             else {
-                songs.addSong(new Song(inputName.getText(), inputArtist.getText(), Integer.parseInt(inputDuration.getText()), inputGenre.getText(), filePath));
-                output.setText("Song added");
-                list.addElement(inputName.getText());
+                try {
+                    songs.addSong(new Song(inputName.getText(), inputArtist.getText(), Integer.parseInt(inputDuration.getText()), inputGenre.getText(), filePath));
+                    output.setText("Song added");
+                    list.addElement(inputName.getText());
+                }
+                catch(NumberFormatException d) {
+                    output.setText(d.getMessage());
+                }
+                
                 
             }
         });
 
+        //Removes current song and updates the playlist songs shown
         JButton remove = new JButton("Remove song");
 
         remove.addActionListener(e -> {
@@ -222,6 +280,7 @@ public class Main {
             songs.setCurrentSong(1);
         });
 
+        //Clears playlist of songs and resets songs shown
         JButton clear = new JButton("Clear songs");
         clear.addActionListener(e -> {
             songs.clearSongs();
@@ -232,7 +291,8 @@ public class Main {
         });
 
 
-
+        //if triple clicked adds that songs to queue
+        //Double click just plays the song
         playlist.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -263,6 +323,7 @@ public class Main {
             }
         });
 
+        //Changes the display of the song being played
         playlist.setCellRenderer((jlist, value, index, isSelected, cellHasFocus) -> {
             JLabel label2 = new JLabel(value);
             if(songs.getCurrentSong() != null &&value.equals(songs.getCurrentSong().getSong().getTitle())) {
@@ -276,11 +337,16 @@ public class Main {
             return label2;
         });
 
+        //Exits app
         JButton exit = new JButton("Quit");
         exit.addActionListener(e -> {
             System.exit(1);
         });
 
+        //Allows playlist options
+        //Can create new playlist, load one from file that makes one with existing
+        // data, or saves the current playlist to file
+        
         JComboBox menu = new JComboBox<>(new String[]{"Menu Options","New Playlist", "Load playlist", "Save playlist"});
         menu.setPreferredSize(new Dimension(120, 25));
 
@@ -326,6 +392,7 @@ public class Main {
                 }
             }
             else {
+                //Switches from one playlist to the next
                 String name =(String) editPlaylist.getSelectedItem();
                 if(!name.equals(songs.getName())) {
                     for(Playlist p : playlists) {
@@ -348,6 +415,7 @@ public class Main {
             
         });
 
+        //Toggles repeating song or playlist
         JLabel repeatSong = new JLabel("Repeat song");
         repeatSong.setPreferredSize(new Dimension(120, 25));
         JCheckBox repeatingSong = new JCheckBox();
@@ -364,6 +432,8 @@ public class Main {
             songs.toggleRepeatPlaylist();
         });
 
+        //Sets volume depending on where slider is
+        //Can also mute
         JSlider slider = new JSlider(0, 2, 1);
         slider.setMajorTickSpacing(1);
         slider.setPaintTicks(true);
@@ -394,8 +464,11 @@ public class Main {
             muted = !muted;
         });
 
+        //Can search for a song and displays in the playlist part
+        //Only shows song that matches input
+        //Can reset to all songs
         JButton reset = new JButton("Reset");
-        JTextField input = new JTextField(15);
+        JTextField input = new JTextField("Enter name of song to search(delete this text)");
         JButton search = new JButton("Search");
 
         reset.setPreferredSize(new Dimension(70, 20));
@@ -427,6 +500,8 @@ public class Main {
             } 
         });
 
+        //Allows different kinds of sorts
+        //Displays new sorted list
         JComboBox sort = new JComboBox<String>(new String[]{"Sort by: ", "Title", "Artist", "Duration"});
         sort.setPreferredSize(new Dimension(120, 25));
         JButton sortEnter = new JButton("Enter");
@@ -493,6 +568,10 @@ public class Main {
                 }
             }
         });
+        //Shuffle and smart shuffle
+        //Toggles shuffle to only play random songs
+        //If on, then the option for smart shuffle appears
+        //That only plays random songs no repeating until done
         JPanel hidden = new JPanel(new FlowLayout(FlowLayout.LEFT));
         hidden.setVisible(false);
 
@@ -523,6 +602,9 @@ public class Main {
             
         });
 
+        //Allows cross playlist song movement
+        //You can either move a song from one to another or just copy and paste
+        //Copy and paste doesn't remove from current playlist
         JComboBox crossPlaylist = new JComboBox<>(new String[]{"Cross Playlist", "Move current song", "Copy and paste current song"});
         JButton crossButton = new JButton("Sent");
 
@@ -564,6 +646,7 @@ public class Main {
 
         });
 
+        //Speed slider to change playback speed
         JSlider speed = new JSlider(0, 2, 1);
         JLabel speedLabel = new JLabel("Playback speed");
 
@@ -579,9 +662,34 @@ public class Main {
             }
         });
 
+        //Deletes duplicates
+        JButton duplicates = new JButton("Delete duplicates");
+
+        duplicates.addActionListener(e -> {
+            boolean result = songs.removeDuplicates();
+            if(result) {
+                output.setText("Duplicates removed");
+            }
+            else {
+                output.setText("No duplicates removed");
+            }
+            for(int i = list.size() - 1 ; i >= 0; i--) {
+                list.remove(i);
+            }
+            SongNode temp0 = songs.getSongs().getHead();
+            while(temp0 != null) {
+                list.addElement(temp0.getSong().getTitle());
+                temp0 = temp0.getSongNext();
+            }
+            playlist.repaint();
+            songs.setCurrentSong(1);
+            
+
+        });
+
        
 
-    
+        //Makes the rows for the needed side
 
         JPanel leftSide = new JPanel(new FlowLayout(FlowLayout.LEFT));
         leftSide.add(menu);
@@ -651,11 +759,17 @@ public class Main {
         JPanel row5 = new JPanel(new FlowLayout(FlowLayout.CENTER));
         row5.add(remove);
         row5.add(clear);
+
+        JPanel row6 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        row6.add(duplicates);
         
 
         JPanel rightSide = new JPanel(new FlowLayout(FlowLayout.CENTER));
         rightSide.add(file);
         rightSide.add(submit);
+
+
+        //Adds those rows to respective side
 
         test.setLayout(new BoxLayout(test, BoxLayout.Y_AXIS));
         test.add(row1);
@@ -665,6 +779,7 @@ public class Main {
         test.add(row3);
         test.add(row4);
         test.add(row5);
+        test.add(row6);
         
 
 
@@ -695,7 +810,7 @@ public class Main {
         frame.setLayout(new BorderLayout());
 
         
-        
+        //adds all three columns to the frame
         frame.add(test, BorderLayout.CENTER);
         frame.add(right, BorderLayout.EAST);
         frame.add(left, BorderLayout.WEST);
@@ -706,6 +821,11 @@ public class Main {
 
     }
 
+    /*
+     * Saves playlist and songs to file
+     * @throws IOException if error saving
+     * @params playlist used to save
+     */
     public static void saveToFile(Playlist songs, String filePath, JTextArea output) {
         BufferedWriter writer = null;
         try {
@@ -734,6 +854,12 @@ public class Main {
         }
     }
 
+    /*
+     * Creates playlist
+     * @throws NNumberFormatException if parsing fails
+     * @params ArrayList of lines
+     * @returns playlist after everything is added
+     */
     public static Playlist createPlaylist(ArrayList<String> lines, String name, JTextArea output) {
         Playlist temp = new Playlist(name, progressBar);
         for(String s : lines) {
@@ -741,13 +867,19 @@ public class Main {
                 String[] items = s.split(",");
                 temp.addSong(new Song(items[0], items[1], Integer.parseInt(items[2]), items[3], items[4]));   
             }
-            catch(NumberFormatException e) {
-                output.setText(e.getMessage());
+            catch(NumberFormatException d) {
+                output.setText(d.getMessage());
             }
         }
         return temp;
     }
 
+    /*
+     * Loads playlist from csv
+     * @throws IOException if error reading
+     * @returns ArrayList of the lines
+     * @params of the file String
+     */
     public static ArrayList<String> loadPlaylist(String file, JTextArea output) {
         BufferedReader reader = null;
         ArrayList<String> lines = new ArrayList<>();

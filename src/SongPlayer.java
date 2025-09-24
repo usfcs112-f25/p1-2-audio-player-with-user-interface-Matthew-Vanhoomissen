@@ -38,12 +38,18 @@ public class SongPlayer {
             
             mediaPlayer.setOnEndOfMedia(whenSongEnds);
             
+            /*
+             * When media player is ready it creates the JProgressbar for the specific song
+             */
             mediaPlayer.setOnReady(() -> {
                 Duration total = mediaPlayer.getMedia().getDuration();
                 progressBar.setMinimum(0);
                 progressBar.setMaximum((int) total.toSeconds());
             });
 
+            /*
+             * When the seconds change it updates the progress bar with current time/total
+             */
             mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
                 SwingUtilities.invokeLater(() -> {
                     if(mediaPlayer != null) {
@@ -65,6 +71,9 @@ public class SongPlayer {
         
     }
 
+    /*
+     * @returns progress bar
+     */
     public JProgressBar getProgress() {
         return progressBar;
     }
@@ -131,10 +140,19 @@ public class SongPlayer {
         mediaPlayer.setVolume(vol);
     }
 
+    /*
+     * sets speed based off
+     * @params double input
+     */
     public void setSpeed(double speed) {
         mediaPlayer.setRate(speed);
     }
 
+    /*
+     * Formats the time duration to be mins:secs
+     * @params is the raw duration
+     * @returns the String form
+     */
     public String formatTime(Duration d) {
         int secs = (int) d.toSeconds();
         int mins = secs / 60;
