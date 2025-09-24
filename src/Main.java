@@ -40,7 +40,9 @@ public class Main {
          * 
          */
         ArrayList<Playlist> playlists = new ArrayList<>();
-        
+        songs.addSong(new Song("Testing1", "Me", 4, "Test", "../music/file_example_WAV_1MG.wav"));
+        songs.addSong(new Song("Testing2", "You", 94, "Test2", "../music/running-night-393139.mp3"));
+
         playlists.add(songs);
         SongPlayer songPlayer = songs.getSongPlayer();
         
